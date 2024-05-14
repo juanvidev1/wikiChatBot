@@ -22,16 +22,10 @@ async function sendMessage() {
   let botRes;
   if (wordsArray.includes(message.toLowerCase())) {
     botRes =
-      "Welcome! I'm not bilingual, so please speak only in english. Por favor sólo inglés. \nYou can ask about a character or something and you will get a short answer from wikipedia about that particular answer \nThis bot is a little project to test wit.ai and won't save your answers or bot responses for the moment \nHave fun!";
+      "Welcome! I'm not bilingual, so please speak only in english. Por favor sólo inglés. You can ask about a character or something and you will get a short answer from wikipedia about that particular answer \nThis bot is a little project to test wit.ai and won't save your answers or bot responses for the moment \nHave fun!";
   } else {
     // console.log("Message in if", message);
-    try {
-      botRes = await botResponse(message);
-    } catch (error) {
-      console.error("Error in sendMessage", error);
-      botRes =
-        "Sorry, I'm having trouble understanding your message. Please try again later.";
-    }
+    botRes = await botResponse(message.toLowerCase());
   }
 
   // Clear the input
@@ -41,17 +35,7 @@ async function sendMessage() {
   setTimeout(function () {
     var botMessage = document.createElement("div");
     botMessage.className = "message bot";
-    // Divide el mensaje del bot en líneas y crea nodos de texto para cada línea
-    if (botRes.includes("\n")) {
-      const lines = botRes.split("\n");
-      lines.forEach((line) => {
-        const lineNode = document.createElement("p");
-        lineNode.textContent = line;
-        botMessage.appendChild(lineNode);
-      });
-    } else {
-      botMessage.textContent = botRes;
-    }
+    botMessage.textContent = botRes === undefined ? "Not found" : botRes;
 
     chatMessages.appendChild(botMessage);
 
@@ -62,11 +46,10 @@ async function sendMessage() {
 
 async function botResponse(message) {
   const raw = JSON.stringify({ message });
-  //   console.log("Message in func", raw);
+  console.log("Message in func", raw);
 
   let options = {
     method: "POST",
-    mode: "no-cors",
     headers: {
       "Content-Type": "application/json",
     },
@@ -84,12 +67,13 @@ async function botResponse(message) {
     }
 
     const data = await response.json();
-    // console.log("Data", data);
+    console.log("Data", data);
 
-    if (title !== "Not found") {
+    if (data.title !== "Not found") {
       return data.extract;
     } else {
-      return "Not found";
+      console.log("else", data.title);
+      return data.title;
     }
   } catch (error) {
     console.error("Error in botResponse", error);
