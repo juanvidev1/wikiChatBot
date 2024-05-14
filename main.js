@@ -42,11 +42,16 @@ async function sendMessage() {
     var botMessage = document.createElement("div");
     botMessage.className = "message bot";
     // Divide el mensaje del bot en líneas y crea nodos de texto para cada línea
-    const lines = botRes.split("\n");
-    lines.forEach((line) => {
-      botMessage.appendChild(document.createTextNode(line));
-      botMessage.appendChild(document.createElement("br"));
-    });
+    if (botRes.includes("\n")) {
+      const lines = botRes.split("\n");
+      lines.forEach((line) => {
+        const lineNode = document.createElement("p");
+        lineNode.textContent = line;
+        botMessage.appendChild(lineNode);
+      });
+    } else {
+      botMessage.textContent = botRes;
+    }
 
     chatMessages.appendChild(botMessage);
 
@@ -81,7 +86,11 @@ async function botResponse(message) {
     const data = await response.json();
     // console.log("Data", data);
 
-    return data.extract;
+    if (title !== "Not found") {
+      return data.extract;
+    } else {
+      return "Not found";
+    }
   } catch (error) {
     console.error("Error in botResponse", error);
   }
